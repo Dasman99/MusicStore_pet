@@ -11,8 +11,7 @@ class ImageInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ImageInline]
-    list_display = ["name", "created"]
-    list_filter = ["brand", "created", ]
+    list_display = ["name"]
 
 
 @admin.register(Category)

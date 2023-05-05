@@ -9,8 +9,42 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# class ImageSerializer(serializers.ModelSerializer):
+#     image = serializers.ImageField()
+#
+#     class Meta:
+#         model = ProductImage
+#         fields = ('image')
+
+
+# class ProductSerializer(serializers.ModelSerializer):
+#     # image = ImageSerializer(many=True)
+#
+#     class Meta:
+#         model = Product
+#         fields = '__all__'
+
+    # def validate(self, data):
+    #     if 'image' not in data or not data['image']:
+    #         raise serializers.ValidationError('At least one image is required')
+    #     print(data)
+    #     return data
+
+    # def to_representation(self, instance):
+    #     rep = super().to_representation(instance)
+    #     rep['image'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
+    #     return rep
+    #
+    # def create(self, validated_data):
+    #     # print(validated_data)
+    #     image = validated_data.pop('image')
+    #     # print(image)
+    #     product = Product.objects.create(**validated_data)
+    #     if image:
+    #         ProductImage.objects.bulk_create([ProductImage(product=product, **img) for img in image])
+    #     return product
+
 class ImageSerializer(serializers.ModelSerializer):
-    # image = serializers.ImageField()
 
     class Meta:
         model = ProductImage
@@ -18,58 +52,37 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    # image = ImageSerializer()
+    # image = ImageSerializer(many=True, read_only=False)
 
     class Meta:
         model = Product
         fields = '__all__'
 
-    def validate(self, data):
-        if 'image' not in data or not data['image']:
-            raise serializers.ValidationError('At least one image is required')
-        print(data)
-        return data
+    # def to_representation(self, instance):
+    #     rep = super().to_representation(instance)
+    #     rep['product_images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
+    #     return rep
+
+
+class ProductImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = '__all__'
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['image'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
+        rep['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
         return rep
 
     def create(self, validated_data):
-        # print(validated_data)
-        image = validated_data.pop('image')
-        # print(image)
+        image = self.context.get('image').request.FILES
         product = Product.objects.create(**validated_data)
-        if image:
-            ProductImage.objects.bulk_create([ProductImage(product=product, **img) for img in image])
+        for image in image.values():
+            ProductImage.objects.create(product=product, image=image)
         return product
 
 
-# class ProductImageSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Product
-#         fields = '__all__'
-#
-#     # def validate(self, data):
-#     #     if 'image' not in data or not data['image']:
-#     #         raise serializers.ValidationError('At least one image is required')
-#     #     print(data)
-#     #     return data
-#
-#     # def to_representation(self, instance):
-#     #     rep = super().to_representation(instance)
-#     #     rep['images'] = ProductImageSerializer(instance.images.all(), many=True, context=self.context).data
-#     #     return rep
-#
-#     def create(self, validated_data):
-#         print(validated_data)
-#         images = validated_data.pop('image')
-#         print(images)
-#         product = Product.objects.create(**validated_data)
-#         if images:
-#             ProductImage.objects.bulk_create([ProductImage(product=product, **img) for img in images])
-#         return product
 
 
 class OrderSerializer(serializers.ModelSerializer):

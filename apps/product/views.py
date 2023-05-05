@@ -13,29 +13,23 @@ class BrandList(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
 
 
-class ProductCreate(CreateAPIView):
-    serializer_class = ProductSerializer
+class ProductCreateAPIView(CreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductImageSerializer
 
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        image = data.pop('image', None)
-        brand_id = data.get('brand')
-        # print(images)
-        if brand_id:
-            brand = get_object_or_404(Brand, id=brand_id)
-            print(brand)
-        else:
-            raise ValidationError('Brand ID is required.')
-        product_serializer = self.get_serializer(data=data)
-        product_serializer.is_valid(raise_exception=True)
-        product = product_serializer.save(brand=brand)
-        print(product)
-        if image:
-            for image in image:
-                a = ProductImage.objects.create(product=product, image=image)
-                print(a)
-        response_serializer = self.get_serializer(product)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+    # def create(self, request, *args, **kwargs):
+    #     image_files = request.FILES.getlist('image')
+    #     product_data = request.data
+    #     print(image_files)
+    #     product_serializer = self.get_serializer(data=product_data)
+    #     product_serializer.is_valid(raise_exception=True)
+    #     product = product_serializer.save()
+    #     print(product)
+    #     for image_file in image_files:
+    #         ProductImage.objects.create(product=product, image=image_file)
+    #
+    #     response_serializer = ProductSerializer(product)
+    #     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ProductList(ListAPIView):
