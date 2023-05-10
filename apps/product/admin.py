@@ -4,13 +4,14 @@ from .models import *
 admin.site.register(Review)
 
 
-class ImageInline(admin.TabularInline):
-    model = ProductImage
+
+# class ImageInline(admin.TabularInline):
+#     model = ProductImage
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ImageInline]
+    # inlines = [ImageInline]
     list_display = ["name"]
 
 

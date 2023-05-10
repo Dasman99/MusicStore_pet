@@ -52,35 +52,34 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    # image = ImageSerializer(many=True, read_only=False)
+    images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
         fields = '__all__'
-
-    # def to_representation(self, instance):
-    #     rep = super().to_representation(instance)
-    #     rep['product_images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
-    #     return rep
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Product
+        model = ProductImage
         fields = '__all__'
 
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
-        return rep
+    # def to_representation(self, instance):
+    #     rep = super().to_representation(instance)
+    #     rep['product'] = ProductSerializer(instance.product).data
+    #     return rep
 
     def create(self, validated_data):
-        image = self.context.get('image').request.FILES
+        image = self.context.get('image')
+        if image is not None and 'request' in image:
+            image = image['request'].FILES
         product = Product.objects.create(**validated_data)
-        for image in image.values():
-            ProductImage.objects.create(product=product, image=image)
+        if image is not None:
+            for img in image.values():
+                ProductImage.objects.create(product=product, image=img)
         return product
+
 
 
 
