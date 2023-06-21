@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from Shop.apps.cart.models import Cart
-from Shop.apps.order.models import OrderItem, Order
-from Shop.apps.product.serializers import OrderSerializer
+from MusicStore.apps.cart.models import Cart
+from MusicStore.apps.order.models import OrderItem, Order
+from MusicStore.apps.product.serializers import OrderSerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):

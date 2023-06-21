@@ -53,8 +53,8 @@ class Review(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='image')
-    image = models.ImageField(upload_to='image/')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='media/image/')
 
     def __str__(self):
         return self.product.name

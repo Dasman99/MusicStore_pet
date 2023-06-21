@@ -1,7 +1,5 @@
-from django.core.exceptions import ValidationError
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.generics import GenericAPIView, get_object_or_404, CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework import viewsets, status, generics
+from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,42 +11,35 @@ class BrandList(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
 
 
-class ProductCreateAPIView(viewsets.ModelViewSet):
+class ProductImageAPIView(APIView):
+
+    def get(self, request):
+        product = Product.objects.all()
+        serializer = ProductSerializer(product, many=True)
+        return Response(serializer.data)
+
+
+    def post(self, request):
+        product_id = request.data.get('product')
+        product = Product.objects.get(id=product_id)
+        images = request.FILES.getlist('image')
+        for image in images:
+            ProductImage.objects.create(product=product, image=image)
+        serializer = ProductSerializer(product, context=self.get_renderer_context())
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    model = Product
+    serializer_class = ProductDeleteSerializer
     queryset = Product.objects.all()
-    serializer_class = ProductImageSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-
-    # def create(self, request, *args, **kwargs):
-    #     image_files = request.FILES.getlist('image')
-    #     product_data = request.data
-    #     print(image_files)
-    #     product_serializer = self.get_serializer(data=product_data)
-    #     product_serializer.is_valid(raise_exception=True)
-    #     product = product_serializer.save()
-    #     print(product)
-    #     for image_file in image_files:
-    #         ProductImage.objects.create(product=product, image=image_file)
-    #
-    #     response_serializer = ProductSerializer(product)
-    #     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-
-
-class ProductList(ListAPIView):
+class ProductAPIView(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-
-class ProductDetail(RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
 
 
 class ReviewList(viewsets.ModelViewSet):

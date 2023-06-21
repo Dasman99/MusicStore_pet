@@ -1,17 +1,10 @@
-from rest_framework import viewsets, serializers
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
+from rest_framework import viewsets, permissions
+from rest_framework.permissions import IsAuthenticated
 from .models import Cart
-
-
-class CartSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Cart
-        fields = '__all__'
+from .serializers import CartSerializer
 
 
 class CartList(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated,)
