@@ -7,4 +7,4 @@ from .serializers import CartSerializer
 class CartList(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
